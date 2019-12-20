@@ -27,5 +27,6 @@ module Api
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+    config.generator.test_framework = :rspec
   end
 end
