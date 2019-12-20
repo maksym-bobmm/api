@@ -27,6 +27,9 @@ module Api
 
     # Don't generate system test files.
     config.generators.system_tests = nil
-    config.generator.test_framework = :rspec
+    config.generators.test_framework :rspec
+    config.generators.template_engine :haml
+    config.generators.stylesheet_engine :sass
+    config.time_zone = 'Kyiv'
   end
 end
