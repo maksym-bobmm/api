@@ -1,13 +1,12 @@
 class CreateTickets < ActiveRecord::Migration[5.1]
-  enable_extension 'hstore' unless extension_enabled?('hstore')
   def change
     create_table :tickets do |t|
-      t.string :RequestNumber
-      t.string :SequenceNumber
-      t.string :RequestType
-      t.hstore 'DateTimes'
-      t.hstore 'ServiceArea'
-      t.hstore 'DigsiteInfo'
+      t.string :request_number, null: false
+      t.string :sequence_number, null: false
+      t.string :request_type, null: false
+      t.json :date_times, null: false
+      t.json :service_area, null: false
+      t.json :digsite_info, null: false
 
       t.timestamps
     end

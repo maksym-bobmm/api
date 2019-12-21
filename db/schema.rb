@@ -10,21 +10,29 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20191220144727) do
+ActiveRecord::Schema.define(version: 20191221121149) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
-  enable_extension "hstore"
+
+  create_table "excavators", force: :cascade do |t|
+    t.json "excavator", null: false
+    t.bigint "ticket_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ticket_id"], name: "index_excavators_on_ticket_id"
+  end
 
   create_table "tickets", force: :cascade do |t|
-    t.string "RequestNumber"
-    t.string "SequenceNumber"
-    t.string "RequestType"
-    t.hstore "DateTimes"
-    t.hstore "ServiceArea"
-    t.hstore "DigsiteInfo"
+    t.string "request_number", null: false
+    t.string "sequence_number", null: false
+    t.string "request_type", null: false
+    t.json "date_times", null: false
+    t.json "service_area", null: false
+    t.json "digsite_info", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "excavators", "tickets"
 end
