@@ -1,5 +1,6 @@
 class Excavator < ApplicationRecord
-  validates_presence_of :created_at, :updated_at
+  alias_attribute(:Excavator, :excavator)
+  validates_presence_of :excavator
 
   belongs_to :ticket
 end
