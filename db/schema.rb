@@ -29,7 +29,7 @@ ActiveRecord::Schema.define(version: 20191221121149) do
     t.string "request_type", null: false
     t.json "date_times", null: false
     t.json "service_area", null: false
-    t.json "digsite_info"
+    t.json "digsite_info", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

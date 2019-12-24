@@ -94,3 +94,12 @@ RSpec.configure do |config|
   Kernel.srand config.seed
 =end
 end
+def receive_correct_json
+  JSON.parse(File.read(Rails.root.join('spec', 'support', 'json', 'correct.json')))
+end
+def receive_wrong_json_root_keys
+  JSON.parse(File.read(Rails.root.join('spec', 'support', 'json', 'wrong_root_keys.json')))
+end
+def receive_wrong_json_subkeys
+  JSON.parse(File.read(Rails.root.join('spec', 'support', 'json', 'wrong_subkeys.json')))
+end

@@ -7,7 +7,7 @@ RSpec.describe Excavator, type: :model do
     end
   end
   describe 'validation' do
-    %i[excavator created_at updated_at].each do |column|
+    %i[excavator].each do |column|
       it { is_expected.to validate_presence_of(column) }
     end
   end

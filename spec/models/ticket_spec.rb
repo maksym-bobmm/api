@@ -8,12 +8,12 @@ RSpec.describe Ticket, type: :model do
     end
   end
   describe 'validation' do
-    %i[request_number request_type sequence_number date_times service_area digsite_info
-     created_at updated_at].each do |column|
+    %i[request_number request_type sequence_number date_times service_area digsite_info].each do |column|
       it { is_expected.to validate_presence_of(column) }
     end
   end
   describe 'association' do
     it { is_expected.to have_one(:excavator) }
+    it { is_expected.to accept_nested_attributes_for(:excavator) }
   end
 end
