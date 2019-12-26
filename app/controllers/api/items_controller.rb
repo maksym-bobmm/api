@@ -21,7 +21,7 @@ class Api::ItemsController < ApplicationController
   private
 
   def ticket_params
-    filtered_params = params.permit(
+    permitted_params = params.permit(
         :RequestNumber, :SequenceNumber, :RequestType,
         DateTimes:  :ResponseDueDateTime,
         ServiceArea: [PrimaryServiceAreaCode: [
@@ -30,12 +30,21 @@ class Api::ItemsController < ApplicationController
           AdditionalServiceAreaCodes: [
             SACode: []
           ]
-        ],
+        ]
       )
-    filtered_params.merge(digsite_info:{WellKnownText: params.dig(:ExcavationInfo, :DigsiteInfo, :WellKnownText)})
+    permitted_params.merge(digsite_info:{WellKnownText: params.dig(:ExcavationInfo, :DigsiteInfo, :WellKnownText)})
   end
 
   def excavator_params
-    params.permit(Excavator: [:CompanyName, :Address, :CrewOnsite])
+    permitted_params = params.permit(
+        Excavator: [:CompanyName, :CrewOnsite]
+    )
+    permitted_params['Excavator'].merge!(Address: {
+        Address: params['Excavator']['Address'],
+        City: params['Excavator']['City'],
+        State: params['Excavator']['State'],
+        Zip: params['Excavator']['Zip']
+    })
+    permitted_params
   end
 end
