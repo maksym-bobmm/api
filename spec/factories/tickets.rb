@@ -16,8 +16,6 @@ FactoryBot.define do
                         -81.07759774894413 32.07090546831167,-81.12154306144413 32.08806865844325,
                         -81.13390268058475 32.07206917625161))' }
     end
-    created_at { Time.now }
-    updated_at { Time.now }
 
     factory :ticket_without_response_due_date_time do
       date_times { {} }

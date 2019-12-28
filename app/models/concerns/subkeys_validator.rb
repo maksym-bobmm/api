@@ -32,13 +32,13 @@ module SubkeysValidator
       unless record.attributes.dig('excavator', 'Address', 'Address')
         record.errors.add(:Excavator, 'must have Address -> Address')
       end
-      unless record.attributes.dig('excavator', 'Address', 'Address')
+      unless record.attributes.dig('excavator', 'Address', 'City')
         record.errors.add(:Excavator, 'must have Address -> City')
       end
       unless record.attributes.dig('excavator', 'Address', 'Address')
         record.errors.add(:Excavator, 'must have Address -> State')
       end
-      unless record.attributes.dig('excavator', 'Address', 'Address')
+      unless record.attributes.dig('excavator', 'Address', 'Zip')
         record.errors.add(:Excavator, 'must have Address -> Zip')
       end
     end
