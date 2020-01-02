@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :excavator do
     ticket
@@ -5,10 +7,10 @@ FactoryBot.define do
       { CompanyName: 'John Doe CONSTRUCTION',
         CrewOnsite: 'true',
         Address: {
-            Address: '555 Some RD',
-            City: 'SOME PARK',
-            State: 'ZZ',
-            Zip: '55555'
+          Address: '555 Some RD',
+          City: 'SOME PARK',
+          State: 'ZZ',
+          Zip: '55555'
         } }
     end
 
@@ -25,28 +27,28 @@ FactoryBot.define do
     factory :excavator_without_address do
       excavator do
         { Address: {
-            Address: nil
+          Address: nil
         } }
       end
     end
     factory :excavator_without_city do
       excavator do
         { Address: {
-            City: nil
+          City: nil
         } }
       end
     end
     factory :excavator_without_state do
       excavator do
         { Address: {
-            State: nil
+          State: nil
         } }
       end
     end
     factory :excavator_without_zip do
       excavator do
         { Address: {
-            Zip: nil
+          Zip: nil
         } }
       end
     end

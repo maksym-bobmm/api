@@ -7,7 +7,6 @@ class Api::ItemsController < ApplicationController
     head 422 and return unless check_params
 
     ticket = Ticket.new(ticket_params.merge(excavator_attributes: excavator_params))
-
     if ticket.save
       head 201
     else
@@ -30,6 +29,7 @@ class Api::ItemsController < ApplicationController
     permitted_params.merge(digsite_info: { WellKnownText: params.dig(:ExcavationInfo, :DigsiteInfo, :WellKnownText) })
   end
 
+  # rubocop:disable Metrics/AbcSize
   def excavator_params
     permitted_params = params.permit(
       Excavator: %i[CompanyName CrewOnsite]
@@ -42,6 +42,7 @@ class Api::ItemsController < ApplicationController
     }
     permitted_params
   end
+  # rubocop:enable Metrics/AbcSize
 
   # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength
   def check_params
@@ -50,9 +51,15 @@ class Api::ItemsController < ApplicationController
                           params['DateTimes']['ResponseDueDateTime'] && params['Excavator']['CompanyName'] &&
                           params['ServiceArea']['PrimaryServiceAreaCode']['SACode'] &&
                           params['ServiceArea']['AdditionalServiceAreaCodes']['SACode'] &&
-                          params['ExcavationInfo']['DigsiteInfo']['WellKnownText'] &&
-                          params['Excavator']['Address'] && params['Excavator']['CrewOnsite']
-    rescue NoMethodError
+                          params['Excavator']['CrewOnsite'] &&
+                          # for preventing ActionController::UnfilteredParameters:
+                          # unable to convert unpermitted parameters to hash
+                          params['ExcavationInfo']['DigsiteInfo']['WellKnownText'].present? &&
+                          params['Excavator']['Address'].present? &&
+                          params['Excavator']['State'].present? &&
+                          params['Excavator']['City'].present? &&
+                          params['Excavator']['Zip'].present?
+    rescue NoMethodError, TypeError
       return false
     end
     true
