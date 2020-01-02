@@ -34,7 +34,7 @@ class Api::ItemsController < ApplicationController
     permitted_params = params.permit(
       Excavator: %i[CompanyName CrewOnsite]
     )
-    permitted_params['Excavator'][:Address] = {
+    permitted_params['Excavator']['Address'] = {
       Address: params['Excavator']['Address'],
       City: params['Excavator']['City'],
       State: params['Excavator']['State'],

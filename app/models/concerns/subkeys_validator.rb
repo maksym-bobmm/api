@@ -130,6 +130,10 @@ module SubkeysValidator
       else
         record.errors.add(:Excavator, 'must have Address -> Zip')
       end
+
+      unless record.excavator_before_type_cast.instance_of?(String)
+        record.errors.add(:excavator, 'must be a string')
+      end
     end
     # rubocop:enable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/PerceivedComplexity, Metrics/MethodLength
   end
