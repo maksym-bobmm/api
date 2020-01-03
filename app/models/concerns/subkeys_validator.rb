@@ -131,7 +131,7 @@ module SubkeysValidator
         record.errors.add(:Excavator, 'must have Address -> Zip')
       end
 
-      unless record.excavator_before_type_cast.instance_of?(String)
+      unless record.excavator_before_type_cast.is_a?(Hash)
         record.errors.add(:excavator, 'must be a string')
       end
     end
