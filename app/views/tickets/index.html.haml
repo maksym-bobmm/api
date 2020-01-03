@@ -1,1 +1,19 @@
-%h1 Tickets
+%h1.header Tickets
+.table-center.header
+  %table
+    %tr
+      %th Request Number
+      %th Request Type
+      %th Response Due Date Time
+      %th Primary Service Area Code
+      %th Excavator Company
+      %th Actions
+    - @tickets.each do |ticket|
+      %tr
+        %td=ticket.request_number
+        %td=ticket.request_type
+        %td=ticket.date_times['ResponseDueDateTime']
+        %td=ticket.service_area['PrimaryServiceAreaCode']['SACode']
+        %td=ticket.excavator.excavator['CompanyName']
+        %td
+          = link_to 'show', ticket_path(ticket)

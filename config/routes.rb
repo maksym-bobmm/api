@@ -5,6 +5,7 @@ Rails.application.routes.draw do
     resource :items, only: [:create]
   end
 
-  resource :tickets, only: %i[index show]
+  resources :tickets, only: %i[index show]
+  root 'tickets#index'
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end

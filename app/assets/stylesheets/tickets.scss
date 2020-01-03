@@ -1,3 +1,30 @@
 // Place all the styles related to the Tickets controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+.header {
+  text-align: center;
+}
+.table-center {
+  display: flex;
+  justify-content: center;
+}
+.table-center th{
+  margin: 1px;
+}
+th.left{
+  width: 70%;
+}
+.mb-5{
+  margin-bottom: 15px;
+}
+a.link-center {
+  display: block;
+  text-align: center;
+}
+table.compact p{
+  margin: 0;
+}
+#map {
+  width: 100%;
+  height: 400px;
+}

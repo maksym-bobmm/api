@@ -1,2 +1,44 @@
-%h1 Tickets#show
-%p Find me in app/views/tickets/show.html.haml
+%script{ src: "https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js" }
+%link{ href: "https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css", rel: "stylesheet" }
+
+%h1.header Ticket
+= link_to 'back', tickets_path, class: 'mb-5 link-center'
+.table-center.header
+  %table.compact{border: 1}
+    %tr
+      %th.left Ticket info
+      %th Excavator info
+    %tr
+      %td
+        %p='Request number: ' + @ticket.request_number
+      %td
+        %p='Company name: ' + @ticket.excavator.excavator['CompanyName']
+    %tr
+      %td
+        %p='Sequence number: ' + @ticket.sequence_number
+      %td
+        %p='Crew on site: ' + @ticket.excavator.excavator['CrewOnsite']
+    %tr
+      %td
+        %p='Request type: ' + @ticket.request_type
+      %td
+        %p='Address: ' + @ticket.excavator.excavator['Address']['Address']
+    %tr
+      %td
+        %p='Response due date time: ' + @ticket.date_times['ResponseDueDateTime']
+      %td
+        %p='City: ' + @ticket.excavator.excavator['Address']['City']
+    %tr
+      %td
+        %p='Primary service area SA code: ' + @ticket.service_area['PrimaryServiceAreaCode']['SACode']
+      %td
+        %p='State: ' + @ticket.excavator.excavator['Address']['State']
+    %tr
+      %td
+        %p='Additional service area SA codes: "' + @ticket.service_area['AdditionalServiceAreaCodes']['SACode'].join(', ') + '"'
+      %td
+        %p='Zip: ' + @ticket.excavator.excavator['Address']['Zip']
+    %tr
+      %td
+        %p='WellKnownText: ' + @ticket.digsite_info['WellKnownText']
+#map
