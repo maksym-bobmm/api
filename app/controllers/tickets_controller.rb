@@ -10,14 +10,14 @@ class TicketsController < ApplicationController
     head 422 and return unless params['id']
 
     @ticket = Ticket.includes(:excavator).find(params['id'])
-    geojson = make_geojson(@ticket.digsite_info['WellKnownText'])
+    geojson = build_geojson(@ticket.digsite_info['WellKnownText'])
     gon.geojson = geojson
   end
   # rubocop:enable Style/AndOr
 
   private
 
-  def make_geojson(ticket)
+  def build_geojson(ticket)
     geojson = receive_json_template
     coordinates = parse_coordinates(ticket)
     coordinates.each do |coordinate|
