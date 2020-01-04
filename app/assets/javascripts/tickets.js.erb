@@ -1,10 +1,51 @@
 document.addEventListener('turbolinks:load', function () {
     mapboxgl.accessToken = '<%= Rails.application.secrets.mapbox_map_token %>';
-
+    let geojson = gon.geojson
     let map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/streets-v11',
-        center: [-74.5, 40],
-        zoom: 9
+        center: geojson.source.data.features[0].geometry.coordinates,
+        zoom: 11
+    });
+    let map_controls = {
+        scale: new mapboxgl.ScaleControl({
+            maxWidth: 100,
+            unit: 'metric'
+        }),
+        fullscreen: new mapboxgl.FullscreenControl(),
+        navigation: new mapboxgl.NavigationControl()
+    }
+    map.addControl(map_controls.scale);
+    map.addControl(map_controls.navigation, 'bottom-right');
+    map.addControl(map_controls.fullscreen);
+
+    geojson.source.data.features.forEach(function (marker) {
+        let el = document.createElement('div');
+        el.className = 'marker';
+
+        new mapboxgl.Marker(el)
+            .setLngLat(marker.geometry.coordinates)
+            .addTo(map);
+    })
+
+    geojson = change_json_for_fill(geojson);
+    map.on('load', function() {
+      map.addLayer(geojson);
     });
 });
+function change_json_for_fill(geojson) {
+    geojson.type = 'fill';
+    geojson.id = 'maine';
+    geojson.source.data.type = 'Feature';
+    let coordinates = []
+    for (let features of geojson.source.data.features)
+        coordinates.push(features.geometry.coordinates)
+    geojson.layout = {};
+    geojson.source.data.geometry = {
+        'type': 'Polygon',
+        'coordinates': [
+            coordinates
+        ]
+    };
+    return geojson;
+}
