@@ -1,40 +1,16 @@
-//import 'mapbox-gl/v1.6.1/mapbox-gl.css';
-import { Map } from 'mapbox-gl/dist/mapbox-gl';
-
 document.addEventListener('turbolinks:load', function () {
     mapboxgl.accessToken = '<%= Rails.application.secrets.mapbox_map_token %>';
-    let geojson = gon.geojson
+    let geojson = gon.geojson;
     let map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/streets-v11',
         center: geojson.source.data.features[0].geometry.coordinates,
         zoom: 11
     });
-    let map_controls = {
-        scale: new mapboxgl.ScaleControl({
-            maxWidth: 100,
-            unit: 'metric'
-        }),
-        fullscreen: new mapboxgl.FullscreenControl(),
-        navigation: new mapboxgl.NavigationControl()
-    }
-    map.addControl(map_controls.scale);
-    map.addControl(map_controls.navigation, 'bottom-right');
-    map.addControl(map_controls.fullscreen);
-
-    geojson.source.data.features.forEach(function (marker) {
-        let el = document.createElement('div');
-        el.className = 'marker';
-
-        new mapboxgl.Marker(el)
-            .setLngLat(marker.geometry.coordinates)
-            .addTo(map);
-    })
-
-    geojson = change_json_for_fill(geojson);
-    map.on('load', function() {
-      map.addLayer(geojson);
-    });
+    put_controls_on_map(map);
+    put_points_on_map(map, Object.assign({}, geojson));
+    fill_map_between_points(map, Object.assign({}, geojson));
+    add_cluster_to_map(map, Object.assign(({}, geojson)))
 });
 function change_json_for_fill(geojson) {
     geojson.type = 'fill';
@@ -51,4 +27,130 @@ function change_json_for_fill(geojson) {
         ]
     };
     return geojson;
+}
+function put_controls_on_map(map) {
+    let map_controls = {
+        scale: new mapboxgl.ScaleControl({
+            maxWidth: 100,
+            unit: 'metric'
+        }),
+        fullscreen: new mapboxgl.FullscreenControl(),
+        navigation: new mapboxgl.NavigationControl()
+    }
+    map.addControl(map_controls.scale);
+    map.addControl(map_controls.navigation, 'bottom-right');
+    map.addControl(map_controls.fullscreen);
+}
+function put_points_on_map(map, geojson) {
+    geojson.source.data.features.forEach(function (marker) {
+        let el = document.createElement('div');
+        el.className = 'marker';
+
+        new mapboxgl.Marker(el)
+            .setLngLat(marker.geometry.coordinates)
+            .addTo(map);
+    })
+}
+function fill_map_between_points(map, geojson) {
+    geojson = change_json_for_fill(geojson);
+    map.on('load', function() {
+        map.addLayer(geojson);
+    });
+}
+function add_cluster_to_map(map, geojson) {
+    map.on('load', function() {
+//      map.addLayer(geojson);
+
+
+//        map.loadImage(
+//            'https://image.flaticon.com/icons/png/512/1275/1275502.png',
+//            function(error, image) {
+//                if (error) throw error;
+//                map.addImage('exc', image);
+//                map.addLayer({
+//                    id: 'points2',
+//                    type: 'symbol',
+//                    source: {
+//                        type: 'geojson',
+//                        data: {
+//                            type: "Feature",
+//                            geometry: {
+//                                type: "Point",
+//                                coordinates: [-81.13390268058475, 32.07206917625161]
+//                            }
+//                        }
+//                    },
+//                    'layout': {
+//                        'icon-image': 'exc',
+//                        'icon-size': 0.09,
+//                    }
+//                });
+//            });
+
+
+//      let data = JSON.parse(JSON.stringify(geojson.source.data));
+//      data.type = 'FeatureCollection';
+        map.addSource( "cluster", {
+            type: "geojson",
+            data: {
+                type: "FeatureCollection",
+                crs: { type: "name", properties: { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+                features: [{
+                    type: "Feature",
+                    geometry: {
+                        type: "Point",
+                        coordinates: [-81.13390268058475, 32.07206917625161]
+                    }
+                }]
+
+            },
+            cluster: true,
+            clusterMaxZoom: 14, // Max zoom to cluster points on
+            clusterRadius: 50
+//        length: 80
+        })
+        map.addLayer({
+            id: "clusters",
+            type: "circle",
+            source: "cluster",
+            filter: ['has', 'point_count'],
+            paint: {
+                'circle-color': [
+                    'step',
+                    ['get', 'point_count'],
+                    '#51bbd6',
+                    100,
+                    '#f1f075',
+                    750,
+                    '#f28cb1'
+                ],
+                'circle-radius': [
+                    'step',
+                    ['get', 'point_count'],
+                    20,
+                    100,
+                    30,
+                    750,
+                    40
+                ]
+            }
+        })
+    });
+//    debugger;
+//    let data = JSON.parse(JSON.stringify(geojson.source.data));
+//    data.type = 'FeatureCollection';
+//    map.addSource( "cluster", {
+//      type: "geojson",
+//      data: data,
+//      cluster: "true"
+//      }
+//    )
+//    map.addLayer({
+//        id: "clusters",
+//        type: "cluster",
+//        source: "cluster",
+//        paint: {
+//            'circle-color': '#00ffff'
+//        }
+//    })
 }

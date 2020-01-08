@@ -49,8 +49,8 @@ class TicketsController < ApplicationController
         }
       },
       layout: {
-          'icon-image': 'exc',
-          'icon-size': 0.09,
+        'icon-image': 'exc',
+        'icon-size': 0.09,
       },
       paint: {
         'fill-color': '#369',
