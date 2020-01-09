@@ -1,8 +1,9 @@
-%script{type: 'module', src: "https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js" }
-%link{ href: "https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css", rel: "stylesheet" }
+-#= javascript_include_tag 'https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js'
+-#%script{type: 'module', src: "https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.js" }
+-#%link{ href: "https://api.tiles.mapbox.com/mapbox-gl-js/v1.6.1/mapbox-gl.css", rel: "stylesheet" }
 
 %h1.header Ticket
-= link_to 'back', tickets_path, class: 'mb-5 link-center'
+= link_to 'back', tickets_path, class: 'mb-5 link-center', 'data-turbolinks':'false'
 .table-center.header
   %table.compact{border: 1}
     %tr

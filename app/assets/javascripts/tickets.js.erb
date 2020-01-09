@@ -1,16 +1,22 @@
+
 document.addEventListener('turbolinks:load', function () {
     mapboxgl.accessToken = '<%= Rails.application.secrets.mapbox_map_token %>';
     let geojson = gon.geojson;
+    if (!geojson)
+        return;
     let map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/mapbox/streets-v11',
         center: geojson.source.data.features[0].geometry.coordinates,
-        zoom: 11
+        zoom: 9
     });
     put_controls_on_map(map);
-    put_points_on_map(map, Object.assign({}, geojson));
+    add_source(map, Object.assign({}, geojson));
+    put_points_on_map(map);
     fill_map_between_points(map, Object.assign({}, geojson));
-    add_cluster_to_map(map, Object.assign(({}, geojson)))
+    add_cluster_to_map(map);
+    add_click_on_cluster(map);
+    add_cursor_change_on_cluster(map);
 });
 function change_json_for_fill(geojson) {
     geojson.type = 'fill';
@@ -18,7 +24,7 @@ function change_json_for_fill(geojson) {
     geojson.source.data.type = 'Feature';
     let coordinates = []
     for (let features of geojson.source.data.features)
-        coordinates.push(features.geometry.coordinates)
+        coordinates.push(features.geometry.coordinates);
     geojson.layout = {};
     geojson.source.data.geometry = {
         'type': 'Polygon',
@@ -26,7 +32,24 @@ function change_json_for_fill(geojson) {
             coordinates
         ]
     };
+    geojson.minzoom = 9;
     return geojson;
+}
+function add_source(map, geojson) {
+    map.on('load', function() {
+        map.addSource("excavators", {
+            type: "geojson",
+            data: {
+                type: "FeatureCollection",
+//                crs: { type: "name", properties: { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+                features: geojson.source.data.features
+            },
+            cluster: true,
+            clusterMaxZoom: 8, // Max zoom to cluster points on
+            clusterRadius: 50
+//        length: 80
+        })
+    });
 }
 function put_controls_on_map(map) {
     let map_controls = {
@@ -41,15 +64,29 @@ function put_controls_on_map(map) {
     map.addControl(map_controls.navigation, 'bottom-right');
     map.addControl(map_controls.fullscreen);
 }
-function put_points_on_map(map, geojson) {
-    geojson.source.data.features.forEach(function (marker) {
-        let el = document.createElement('div');
-        el.className = 'marker';
+function put_points_on_map(map) {
+    map.on('load', function() {
+//    geojson.source.data.features.forEach(function (marker) {
+//        let el = document.createElement('div');
+//        el.className = 'marker';
 
-        new mapboxgl.Marker(el)
-            .setLngLat(marker.geometry.coordinates)
-            .addTo(map);
-    })
+//        new mapboxgl.Marker(el)
+//            .setLngLat(marker.geometry.coordinates)
+//            .addTo(map);
+//    })
+        map.addLayer({
+            id: 'unclustered-point',
+            type: 'circle',
+            source: 'excavators',
+            filter: ['!', ['has', 'point_count']],
+            paint: {
+                'circle-color': '#000000',
+                'circle-radius': 10,
+                'circle-stroke-width': 1,
+                'circle-stroke-color': '#fff'
+            }
+        });
+    });
 }
 function fill_map_between_points(map, geojson) {
     geojson = change_json_for_fill(geojson);
@@ -57,100 +94,73 @@ function fill_map_between_points(map, geojson) {
         map.addLayer(geojson);
     });
 }
-function add_cluster_to_map(map, geojson) {
+function add_cluster_to_map(map) {
     map.on('load', function() {
-//      map.addLayer(geojson);
-
-
-//        map.loadImage(
-//            'https://image.flaticon.com/icons/png/512/1275/1275502.png',
-//            function(error, image) {
-//                if (error) throw error;
-//                map.addImage('exc', image);
-//                map.addLayer({
-//                    id: 'points2',
-//                    type: 'symbol',
-//                    source: {
-//                        type: 'geojson',
-//                        data: {
-//                            type: "Feature",
-//                            geometry: {
-//                                type: "Point",
-//                                coordinates: [-81.13390268058475, 32.07206917625161]
-//                            }
-//                        }
-//                    },
-//                    'layout': {
-//                        'icon-image': 'exc',
-//                        'icon-size': 0.09,
-//                    }
-//                });
-//            });
-
-
-//      let data = JSON.parse(JSON.stringify(geojson.source.data));
-//      data.type = 'FeatureCollection';
-        map.addSource( "cluster", {
-            type: "geojson",
-            data: {
-                type: "FeatureCollection",
-                crs: { type: "name", properties: { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-                features: [{
-                    type: "Feature",
-                    geometry: {
-                        type: "Point",
-                        coordinates: [-81.13390268058475, 32.07206917625161]
-                    }
-                }]
-
-            },
-            cluster: true,
-            clusterMaxZoom: 14, // Max zoom to cluster points on
-            clusterRadius: 50
-//        length: 80
-        })
         map.addLayer({
             id: "clusters",
             type: "circle",
-            source: "cluster",
+            source: "excavators",
             filter: ['has', 'point_count'],
             paint: {
                 'circle-color': [
                     'step',
                     ['get', 'point_count'],
-                    '#51bbd6',
-                    100,
+                    '#000000',
+                    5,
                     '#f1f075',
-                    750,
-                    '#f28cb1'
+                    15,
+                    '#72f238'
                 ],
                 'circle-radius': [
                     'step',
                     ['get', 'point_count'],
                     20,
-                    100,
+                    5,
                     30,
-                    750,
+                    15,
                     40
-                ]
+                ],
+                'circle-stroke-color': 'black',
+                'circle-stroke-width': 1
             }
         })
+        map.addLayer({
+            id: 'cluster-count',
+            type: 'symbol',
+            source: 'excavators',
+            filter: ['has', 'point_count'],
+            layout: {
+                'text-field': '{point_count_abbreviated}',
+                'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+                'text-size': 16
+            }
+        });
     });
-//    debugger;
-//    let data = JSON.parse(JSON.stringify(geojson.source.data));
-//    data.type = 'FeatureCollection';
-//    map.addSource( "cluster", {
-//      type: "geojson",
-//      data: data,
-//      cluster: "true"
-//      }
-//    )
-//    map.addLayer({
-//        id: "clusters",
-//        type: "cluster",
-//        source: "cluster",
-//        paint: {
-//            'circle-color': '#00ffff'
-//        }
-//    })
+}
+function add_click_on_cluster(map) {
+    map.on('click', 'clusters', function(e) {
+        let features = map.queryRenderedFeatures(e.point, {
+            layers: ['clusters']
+        });
+        let clusterId = features[0].properties.cluster_id;
+        map.getSource('excavators').getClusterExpansionZoom(
+            clusterId,
+            function(err, zoom) {
+                if (err) return;
+
+                map.easeTo({
+                    center: features[0].geometry.coordinates,
+                    zoom: zoom
+                });
+            }
+        );
+    });
+}
+function add_cursor_change_on_cluster(map) {
+    map.on('mouseenter', 'clusters', function() {
+        map.getCanvas().style.cursor = 'pointer';
+    });
+    map.on('mouseleave', 'clusters', function() {
+        map.getCanvas().style.cursor = '';
+    });
 }
