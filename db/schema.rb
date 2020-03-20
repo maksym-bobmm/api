@@ -1,3 +1,4 @@
+#%RAML 0.8
 # frozen_string_literal: true
 
 # This file is auto-generated from the current state of the database. Instead
